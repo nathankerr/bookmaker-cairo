@@ -124,7 +124,7 @@ void get_evenodd_cropboxes(PopplerDocument *document, cairo_rectangle_t *odd_pag
 	exit_if_cairo_surface_status_not_success(even_pages, __FILE__, __LINE__);
 }
 
-void chapbook(char *input_filename, char *output_filename) {
+void make_chapbook(char *input_filename, char *output_filename) {
 	printf("Creating chapbook\n");
 	// 1 pt = 1/27 in
 	// 1 in = 2.54 cm
