@@ -4,8 +4,11 @@ LDFLAGS=`pkg-config --libs cairo poppler-glib` -L`brew --prefix gettext`/lib
 
 book: bookmaker
 	rm -f book.pdf
-	./bookmaker PDF32000_2008-short.pdf
+	./bookmaker PDF32000_2008-short.pdf book.pdf
 	open book.pdf
 
+bookmaker: main.o chapbook.o
+	$(CC) -o $@ $+ $(CFLAGS) $(LDFLAGS)
+
 clean:
-	rm -rf bookmaker bookmaker.dSYM book.pdf even.pdf odd.pdf
+	rm -rf bookmaker bookmaker.dSYM *.book*.pdf *.o

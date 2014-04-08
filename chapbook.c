@@ -124,13 +124,8 @@ void get_evenodd_cropboxes(PopplerDocument *document, cairo_rectangle_t *odd_pag
 	exit_if_cairo_surface_status_not_success(even_pages, __FILE__, __LINE__);
 }
 
-int main(int argc, char** argv) {
-	if (argc != 2) {
-		printf("Usage: %s <input.pdf>\n", argv[0]);
-		exit(1);
-	}
-	char* input_filename = argv[1];
-
+void chapbook(char *input_filename, char *output_filename) {
+	printf("Creating chapbook\n");
 	// 1 pt = 1/27 in
 	// 1 in = 2.54 cm
 	// A4 210x297mm = 595.224x841.824 
@@ -164,7 +159,7 @@ int main(int argc, char** argv) {
 	get_evenodd_cropboxes(document, &even_page_crop_box, &odd_page_crop_box);
 
 	// create a landscape surface for the paper
-	cairo_surface_t* surface = cairo_pdf_surface_create("book.pdf", PAPER_WIDTH, PAPER_HEIGHT);
+	cairo_surface_t* surface = cairo_pdf_surface_create(output_filename, PAPER_WIDTH, PAPER_HEIGHT);
 	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
 	cairo_t *cr = cairo_create(surface);
 	exit_if_cairo_status_not_success(cr, __FILE__, __LINE__);
@@ -307,5 +302,4 @@ FINISH_LAYOUT:
 
 	cairo_surface_destroy(surface);
 	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
-	return 0;
 }
