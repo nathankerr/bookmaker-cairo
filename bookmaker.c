@@ -83,47 +83,11 @@ PopplerDocument* open_document(char* filename, GError **error) {
 	return document;
 }
 
-int main(int argc, char** argv) {
-	if (argc != 2) {
-		printf("Usage: %s <input.pdf>\n", argv[0]);
-		exit(1);
-	}
-	char* input_filename = argv[1];
-
-	// 1 pt = 1/27 in
-	// 1 in = 2.54 cm
-	// A4 210x297mm = 595.224x841.824 
-	const double PAPER_HEIGHT = 595.224;
-	const double PAPER_WIDTH = 841.824;
-
-	const double MARGIN = 15; // unprintable margin
-	const double GUTTER = 36; // interior margin
-
-	// width and height of the scaled pages
-	const double PAGE_WIDTH = PAPER_WIDTH/2.0 - MARGIN - GUTTER;
-	const double PAGE_HEIGHT = PAPER_HEIGHT - MARGIN - MARGIN;
-
-	// create a landscape surface for the paper
-	cairo_surface_t* surface = cairo_pdf_surface_create("book.pdf", PAPER_WIDTH, PAPER_HEIGHT);
-	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
-
-	cairo_t *cr = cairo_create(surface);
-	exit_if_cairo_status_not_success(cr, __FILE__, __LINE__);
-
-	// load the pdf
+// method: draw all the pages to appropriate recording surfaces and then get ink extents
+void get_evenodd_cropboxes(PopplerDocument *document, cairo_rectangle_t *odd_page_crop_box, cairo_rectangle_t *even_page_crop_box) {
 	GError *error = NULL;
-	PopplerDocument *document = open_document(input_filename, &error);
-	if (document == NULL) {
-		printf("%s:%d: %s\n", __FILE__, __LINE__, error->message);
-		exit(1);
-	}
-
 	int num_document_pages = poppler_document_get_n_pages(document);
-	int num_pages_to_layout = num_document_pages + (4 - (num_document_pages % 4));
-	int show_page = FALSE;
 
-	// figure out the bounding boxes
-	// method: draw all the pages to appropriate recording surfaces and then get ink extents
 	cairo_surface_t *odd_pages = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
 	cairo_surface_t *even_pages = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
 	for (int page_num = 0; page_num < num_document_pages; page_num++) {
@@ -146,21 +110,75 @@ int main(int argc, char** argv) {
 		cairo_destroy(cr);
 	}
 
-	cairo_rectangle_t odd_page_crop_box, even_page_crop_box;
-	cairo_recording_surface_ink_extents(odd_pages, &odd_page_crop_box.x, &odd_page_crop_box.y, &odd_page_crop_box.width, &odd_page_crop_box.height);
-	cairo_recording_surface_ink_extents(even_pages, &even_page_crop_box.x, &even_page_crop_box.y, &even_page_crop_box.width, &even_page_crop_box.height);
+	cairo_recording_surface_ink_extents(odd_pages,
+		&odd_page_crop_box->x,
+		&odd_page_crop_box->y,
+		&odd_page_crop_box->width,
+		&odd_page_crop_box->height);
+	cairo_recording_surface_ink_extents(even_pages,
+		&even_page_crop_box->x,
+		&even_page_crop_box->y,
+		&even_page_crop_box->width,
+		&even_page_crop_box->height);
 
 	// use to check extent and crop box handling
-	// write_surface_to_file_showing_crop_box("odd.pdf", odd_pages, &odd_page_crop_box);
-	// write_surface_to_file_showing_crop_box("even.pdf", even_pages, &even_page_crop_box);
+	// write_surface_to_file_showing_crop_box("odd.pdf", odd_pages, odd_page_crop_box);
+	// write_surface_to_file_showing_crop_box("even.pdf", even_pages, even_page_crop_box);
 
 	// cleanup surfaces used to get crop boxes
 	cairo_surface_destroy(odd_pages);
 	exit_if_cairo_surface_status_not_success(odd_pages, __FILE__, __LINE__);
 	cairo_surface_destroy(even_pages);
 	exit_if_cairo_surface_status_not_success(even_pages, __FILE__, __LINE__);
+}
+
+int main(int argc, char** argv) {
+	if (argc != 2) {
+		printf("Usage: %s <input.pdf>\n", argv[0]);
+		exit(1);
+	}
+	char* input_filename = argv[1];
+
+	// 1 pt = 1/27 in
+	// 1 in = 2.54 cm
+	// A4 210x297mm = 595.224x841.824 
+	const double PAPER_HEIGHT = 595.224;
+	const double PAPER_WIDTH = 841.824;
+
+	const double MARGIN = 15; // unprintable margin
+	const double GUTTER = 36; // interior margin
+
+	// width and height of the scaled pages
+	const double PAGE_WIDTH = PAPER_WIDTH/2.0 - MARGIN - GUTTER;
+	const double PAGE_HEIGHT = PAPER_HEIGHT - MARGIN - MARGIN;
+
+	// load the pdf
+	GError *error = NULL;
+	PopplerDocument *document = open_document(input_filename, &error);
+	if (document == NULL) {
+		printf("%s:%d: %s\n", __FILE__, __LINE__, error->message);
+		exit(1);
+	}
+
+	// figure out how many pages to layout
+	int num_document_pages = poppler_document_get_n_pages(document);
+	int num_pages_to_layout = num_document_pages;
+	if (num_pages_to_layout%4 != 0) {
+		num_pages_to_layout = num_document_pages + (4 - (num_document_pages % 4));
+	}
+
+	// figure out the bounding boxes
+	cairo_rectangle_t even_page_crop_box, odd_page_crop_box;
+	get_evenodd_cropboxes(document, &even_page_crop_box, &odd_page_crop_box);
+
+	// create a landscape surface for the paper
+	cairo_surface_t* surface = cairo_pdf_surface_create("book.pdf", PAPER_WIDTH, PAPER_HEIGHT);
+	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
+	cairo_t *cr = cairo_create(surface);
+	exit_if_cairo_status_not_success(cr, __FILE__, __LINE__);
 
 	// layout the pages on the paper
+	int show_page = FALSE;
 	for (int page_to_layout = 0; page_to_layout < num_pages_to_layout; page_to_layout++) {
 		cairo_save(cr);
 
@@ -194,43 +212,64 @@ int main(int argc, char** argv) {
 			exit(1);		
 		}
 
+		// figure out the desired placement
+		double X = 0;
+		double Y = MARGIN;
+		double WIDTH = PAGE_WIDTH;
+		double HEIGHT = PAGE_HEIGHT;
+
+		if (is_recto) {
+			X += PAPER_WIDTH/2.0 + GUTTER;
+		} else {
+			X += MARGIN;
+		}
+
 		// figure out the scale factor
 		double scale_factor = 1;
-		double page_aspect_ratio = PAGE_HEIGHT / PAGE_WIDTH;
+		double page_aspect_ratio = HEIGHT / WIDTH;
 		double crop_box_aspect_ratio = crop_box->height / crop_box->width;
 		if (page_aspect_ratio > crop_box_aspect_ratio) {
-			scale_factor = PAGE_WIDTH / crop_box->width;
+			scale_factor = WIDTH / crop_box->width;
 		} else {
-			scale_factor = PAGE_HEIGHT / crop_box->height;
+			scale_factor = HEIGHT / crop_box->height;
 		}
-		// printf("%f %f\n", page_aspect_ratio, crop_box_aspect_ratio);
 
-		// vertical offset
-		double scaled_height = crop_box->height * scale_factor;
-		double vertical_offset = (PAPER_HEIGHT - scaled_height)/2.0;
-		cairo_translate(cr, 0, vertical_offset);
+		// draw the desired placement
+#ifdef DISPLAY_BOXES
+		cairo_set_source_rgb(cr, 1.0, 0, 0);
+		cairo_rectangle(cr, X, Y, WIDTH, HEIGHT);
+		cairo_stroke(cr);
+		cairo_set_source_rgb(cr, 0, 0, 0);
+#endif
 
-		// horizontal offset
-		// double scaled_width = crop_box->width * scale_factor;
-		cairo_translate(cr, PAPER_WIDTH/2.0, 0);
-		if (is_recto) {
-			cairo_translate(cr, GUTTER, 0);
-		} else {
-			// cairo_translate(cr, -(scaled_width + GUTTER), 0);
-			cairo_translate(cr, -(crop_box->width + GUTTER), 0);
+		// scale to the size of the crop box
+		// double horizontal_scale = WIDTH / crop_box->width;
+		// double vertical_scale = HEIGHT / crop_box->height;
+		double horizontal_scale = scale_factor;
+		double vertical_scale = scale_factor;
+		double horizontal_offset = X - (crop_box->x * horizontal_scale);
+		double vertical_offset = Y - (crop_box->y * vertical_scale);
+
+		// float verso pages toward the gutter
+		if (!is_recto) {
+			horizontal_offset += (WIDTH) - (crop_box->width * horizontal_scale);
 		}
+
+		cairo_translate(cr, horizontal_offset, vertical_offset);
+		cairo_scale(cr, horizontal_scale, vertical_scale);
 
 		// scale and position the cropped page
+		// cairo_translate(cr, horizontal_offset, vertical_offset);
 		// cairo_scale(cr, scale_factor, scale_factor);
-		cairo_translate(cr, -crop_box->x, -crop_box->y);
 
-		// printf("page %d\n", page_num);
 		poppler_page_render_for_printing(page, cr);
 
 		// draw the crop box around the page
 #ifdef DISPLAY_BOXES
+		cairo_set_source_rgb(cr, 0, 1.0, 0);
 		cairo_rectangle(cr, crop_box->x, crop_box->y, crop_box->width, crop_box->height);
 		cairo_stroke(cr);
+		cairo_set_source_rgb(cr, 0, 0, 0);
 #endif
 		
 		g_object_unref(page);
