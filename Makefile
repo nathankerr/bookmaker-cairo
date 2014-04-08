@@ -7,7 +7,7 @@ book: bookmaker
 	./bookmaker PDF32000_2008-short.pdf book.pdf
 	open book.pdf
 
-bookmaker: main.o chapbook.o
+bookmaker: main.o options.o chapbook.o
 	$(CC) -o $@ $+ $(CFLAGS) $(LDFLAGS)
 
 clean:
