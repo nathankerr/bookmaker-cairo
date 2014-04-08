@@ -48,18 +48,18 @@ char *create_output_filename(char *input_filename) {
 	return output_filename;
 }
 
-struct options_t* parse_options(int argc, char** argv) {
-	struct options_t *options = malloc(sizeof(struct options_t));
+struct options_t parse_options(int argc, char** argv) {
+	struct options_t options;
 
 	// set defaults
-	options->executable_name = argv[0];
-	options->input_filename = NULL;
-	options->output_filename = NULL;
-	options->paper = a4;
-	options->type = chapbook;
-	options->trim = even_odd;
-	options->print_page_numbers = TRUE;
-	options->print = FALSE;
+	options.executable_name = argv[0];
+	options.input_filename = NULL;
+	options.output_filename = NULL;
+	options.paper = a4;
+	options.type = chapbook;
+	options.trim = even_odd;
+	options.print_page_numbers = TRUE;
+	options.print = FALSE;
 
 	enum {
 		paper_option,
@@ -86,47 +86,47 @@ struct options_t* parse_options(int argc, char** argv) {
 		case 'h': // same as default
 		case paper_option:
 			if (strcasecmp(optarg, "a4") == 0) {
-				options->paper = a4;
+				options.paper = a4;
 			} else if (strcasecmp(optarg, "letter") == 0) {
-				options->paper = letter;
+				options.paper = letter;
 			} else {
 				printf("ERROR: Unknown paper size: %s\n\n", optarg);
-				usage(options->executable_name);
+				usage(options.executable_name);
 			}
 			break;
 		case type_option:
 			if (strcasecmp(optarg, "chapbook") == 0) {
-				options->type = chapbook;
+				options.type = chapbook;
 			} else if (strcasecmp(optarg, "perfect") == 0) {
-				options->type = perfect;
+				options.type = perfect;
 			} else {
 				printf("ERROR: Unknown binding type: %s\n\n", optarg);
-				usage(options->executable_name);
+				usage(options.executable_name);
 			}
 			break;
 		case trim_option:
 			if (strcasecmp(optarg, "even-odd") == 0) {
-				options->trim = even_odd;
+				options.trim = even_odd;
 			} else if (strcasecmp(optarg, "document") == 0) {
-				options->trim = document;
+				options.trim = document;
 			} else if (strcasecmp(optarg, "per-page") == 0) {
-				options->trim = per_page;
+				options.trim = per_page;
 			} else {
 				printf("ERROR: Unknown trim type: %s\n\n", optarg);
-				usage(options->executable_name);
+				usage(options.executable_name);
 			}
 			break;
 		case no_page_numbers_option:
-			options->print_page_numbers = FALSE;
+			options.print_page_numbers = FALSE;
 			break;
 		case print_option:
-			options->print = TRUE;
+			options.print = TRUE;
 			break;
 		case version_option:
 			printf("%s\n", VERSION);
 			exit(0);
 		default:
-			usage(options->executable_name);
+			usage(options.executable_name);
 		}
 	}
 
@@ -135,28 +135,28 @@ struct options_t* parse_options(int argc, char** argv) {
 
 	switch (argc) {
 	case 2:
-		options->output_filename = argv[1];
+		options.output_filename = argv[1];
 	case 1:
-		options->input_filename = argv[0];
+		options.input_filename = argv[0];
 		break;
 	default:
-		usage(options->executable_name);
+		usage(options.executable_name);
 		exit(0);
 	}
 
 	// makeup a suitable output filename if none exists
-	if (options->output_filename == NULL) {
-		options->output_filename = create_output_filename(options->input_filename);
+	if (options.output_filename == NULL) {
+		options.output_filename = create_output_filename(options.input_filename);
 	}
 
 	return options;
 }
 
-void print_options(struct options_t* options) {
-	printf("INPUT: %s\n", options->input_filename);
-	printf("OUTPUT: %s\n", options->output_filename);
+void print_options(struct options_t options) {
+	printf("INPUT: %s\n", options.input_filename);
+	printf("OUTPUT: %s\n", options.output_filename);
 	printf("PAPER: ");
-	switch (options->paper) {
+	switch (options.paper) {
 	case a4:
 		printf("a4\n");
 		break;
@@ -167,7 +167,7 @@ void print_options(struct options_t* options) {
 		printf("ERROR\n");
 	}
 	printf("TYPE: ");
-	switch (options->type) {
+	switch (options.type) {
 	case chapbook:
 		printf("chapbook\n");
 		break;
@@ -178,7 +178,7 @@ void print_options(struct options_t* options) {
 		printf("ERROR\n");
 	}
 	printf("TRIM: ");
-	switch (options->trim) {
+	switch (options.trim) {
 	case even_odd:
 		printf("even-odd\n");
 		break;
@@ -192,13 +192,13 @@ void print_options(struct options_t* options) {
 		printf("ERROR\n");
 	}
 	printf("PAGE NUMBERS: ");
-	if (options->print_page_numbers) {
+	if (options.print_page_numbers) {
 		printf("yes\n");
 	} else {
 		printf("no\n");
 	}
 	printf("PRINT: ");
-	if (options->print) {
+	if (options.print) {
 		printf("yes\n");
 	} else {
 		printf("no\n");
