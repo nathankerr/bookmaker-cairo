@@ -18,7 +18,7 @@ void usage(char *executable_name) {
 	printf("\t--type {chapbook,perfect}\n\t\t\t\tType of imposition to make. Default is chapbook\n");
 	printf("\t--trim {even-odd,document,per-page}\n\t\t\t\tControls how whitespace is trimmed off.\n\t\t\t\tDefault is even-odd.\n");
 	printf("\t--nopagenumbers\t\tsuppress additional page numbers\n");
-	printf("\t--print\t\t\tsend result to default printer\n");
+	printf("\t--print\t\t\tsend result to default printer instead of saving to file\n");
 	printf("\t--printer PRINTER\tprint result to specific printer\n\t\t\t\t(implies --print)\n");
 	printf("\t--version\t\tprints the version string and exits\n");
 	exit(1);
@@ -60,6 +60,7 @@ struct options_t parse_options(int argc, char** argv) {
 	options.trim = even_odd;
 	options.print_page_numbers = TRUE;
 	options.print = FALSE;
+	options.printer = NULL;
 
 	enum {
 		paper_option,
@@ -67,6 +68,7 @@ struct options_t parse_options(int argc, char** argv) {
 		trim_option,
 		no_page_numbers_option,
 		print_option,
+		printer_option,
 		version_option
 	};
 	const char *optstring = "h";
@@ -77,6 +79,7 @@ struct options_t parse_options(int argc, char** argv) {
 		{"trim", required_argument, NULL, trim_option},
 		{"nopagenumbers", no_argument, NULL, no_page_numbers_option},
 		{"print", no_argument, NULL, print_option},
+		{"printer", required_argument, NULL, printer_option},
 		{"version", no_argument, NULL, version_option}
 	};
 
@@ -119,6 +122,9 @@ struct options_t parse_options(int argc, char** argv) {
 		case no_page_numbers_option:
 			options.print_page_numbers = FALSE;
 			break;
+		case printer_option:
+			options.printer = optarg;
+			// NO BREAK; --printer implies --print
 		case print_option:
 			options.print = TRUE;
 			break;
@@ -203,4 +209,5 @@ void print_options(struct options_t options) {
 	} else {
 		printf("no\n");
 	}
+	printf("PRINTER: %s\n", options.printer);
 }

@@ -12,6 +12,7 @@
 
 #include <cairo.h>
 #include <cairo-pdf.h>
+#include <cairo-ps.h>
 #include <poppler.h>
 
 #define VERSION "0.3a"
@@ -33,6 +34,7 @@ struct options_t {
 	enum trim_t trim;
 	int print_page_numbers;
 	int print;
+	char* printer;
 	double paper_width;
 	double paper_height;
 };

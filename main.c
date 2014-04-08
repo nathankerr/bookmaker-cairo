@@ -10,9 +10,17 @@ void finishtime(clock_t start) {
 	printf(" %fs\n", (double)(clock() - start)/CLOCKS_PER_SEC);
 }
 
+cairo_status_t write_surface_to_stream(void *closure, const unsigned char *data, unsigned int length) {
+	size_t written = fwrite(data, sizeof(unsigned char), length, (FILE*) closure);	
+	if (written != length) {
+		return CAIRO_STATUS_WRITE_ERROR;
+	}
+	return CAIRO_STATUS_SUCCESS;
+}
+
 int main(int argc, char** argv) {
 	struct options_t options = parse_options(argc, argv);
-	// print_options(options);
+	print_options(options);
 
 	printf("Creating a PDF for a ");
 	switch (options.type) {
@@ -57,7 +65,22 @@ int main(int argc, char** argv) {
 
 	// create the input and output documents
 	PopplerDocument *popplerDocument = open_document(options.input_filename);
-	cairo_surface_t* surface = cairo_pdf_surface_create(options.output_filename, options.paper_width, options.paper_height);
+	cairo_surface_t *surface;
+	FILE *lpr;
+	if (options.print) {
+		// if sending to a printer instead of a file, we can generate ps directly
+		char* lpr_command;
+		asprintf(&lpr_command, "lp %s %s -o sides=two-sided-long-edge -",
+			options.printer != NULL? "-d": "",
+			options.printer != NULL? options.printer:"");
+		// printf("LPR: %s\n", lpr_command);
+		lpr = popen(lpr_command, "w");
+		// lpr = popen("cat - > book.ps", "w"); // for testing
+		surface = cairo_ps_surface_create_for_stream(write_surface_to_stream, lpr, options.paper_width, options.paper_height);
+		free(lpr_command);
+	} else {
+		surface = cairo_pdf_surface_create(options.output_filename, options.paper_width, options.paper_height);
+	}
 	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
 	cairo_t *cr = cairo_create(surface);
 	exit_if_cairo_status_not_success(cr, __FILE__, __LINE__);
@@ -95,7 +118,8 @@ int main(int argc, char** argv) {
 	finishtime(start);
 
 	if(options.print) {
-		NOT_IMPLEMENTED();
+		printf("Sending document to printer\n");
+		pclose(lpr);
 	}
 
 	printf("Done\n");
