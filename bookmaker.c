@@ -1,11 +1,3 @@
-// phase 1: render pdf pages on left hand side of landscape page with overflow (i.e., no scaling, transformation, etc.)
-// phase 2: scale page to fit
-// phase 3: two pages per page (scale and transform)
-// phase 4: chapbook ordering (one page from each end)
-// phase 5: proper page rotation (first spread upright, second upside down)
-// phase 6: command line handling
-// phase 7: bounding box determination and use (even-odd)
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -243,24 +235,16 @@ int main(int argc, char** argv) {
 #endif
 
 		// scale to the size of the crop box
-		// double horizontal_scale = WIDTH / crop_box->width;
-		// double vertical_scale = HEIGHT / crop_box->height;
-		double horizontal_scale = scale_factor;
-		double vertical_scale = scale_factor;
-		double horizontal_offset = X - (crop_box->x * horizontal_scale);
-		double vertical_offset = Y - (crop_box->y * vertical_scale);
+		double horizontal_offset = X - (crop_box->x * scale_factor);
+		double vertical_offset = Y - (crop_box->y * scale_factor);
 
 		// float verso pages toward the gutter
 		if (!is_recto) {
-			horizontal_offset += (WIDTH) - (crop_box->width * horizontal_scale);
+			horizontal_offset += (WIDTH) - (crop_box->width * scale_factor);
 		}
 
 		cairo_translate(cr, horizontal_offset, vertical_offset);
-		cairo_scale(cr, horizontal_scale, vertical_scale);
-
-		// scale and position the cropped page
-		// cairo_translate(cr, horizontal_offset, vertical_offset);
-		// cairo_scale(cr, scale_factor, scale_factor);
+		cairo_scale(cr, scale_factor, scale_factor);
 
 		poppler_page_render_for_printing(page, cr);
 
