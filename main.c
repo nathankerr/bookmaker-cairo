@@ -57,7 +57,9 @@ int main(int argc, char** argv) {
 		options.paper_width = 841.824;
 		break;
 	case letter:
-		NOT_IMPLEMENTED();
+		// LETTER 8.5x11in = 612x792
+		options.paper_height = 612;
+		options.paper_width = 792;
 		break;
 	default:
 		NOT_IMPLEMENTED();
