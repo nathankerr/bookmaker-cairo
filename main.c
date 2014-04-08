@@ -1,8 +1,44 @@
 #include "all.h"
 
+double starttime(char* message) {
+	clock_t start = clock();
+	printf("%s", message);
+	return start;
+}
+
+void finishtime(clock_t start) {
+	printf(" %fs\n", (double)(clock() - start)/CLOCKS_PER_SEC);
+}
+
 int main(int argc, char** argv) {
 	struct options_t options = parse_options(argc, argv);
-	print_options(options);
+	// print_options(options);
+
+	printf("Creating a PDF for a ");
+	switch (options.type) {
+	case chapbook:
+		printf("chapbook");
+		break;
+	case perfect:
+		printf("perfect bound book");
+		break;
+	default:
+		NOT_IMPLEMENTED();
+	}
+	printf(" on ");
+	switch(options.paper) {
+	case a4:
+		printf("a4");
+		break;
+	case letter:
+		printf("letter");
+		break;
+	default:
+		NOT_IMPLEMENTED();
+	}
+	printf(" paper\n");
+
+	clock_t start = starttime("Inspecting PDF");
 
 	switch (options.paper) {
 	case a4:
@@ -42,7 +78,9 @@ int main(int argc, char** argv) {
 	default:
 		NOT_IMPLEMENTED();
 	}
+	finishtime(start);
 
+	start = starttime("Creating Book");
 	// layout the pages
 	layout(popplerDocument, surface, cr, pages, options);
 
@@ -50,10 +88,16 @@ int main(int argc, char** argv) {
 	g_object_unref(popplerDocument);
 
 	exit_if_cairo_status_not_success(cr, __FILE__, __LINE__);
-	cairo_destroy(cr);	
+	cairo_destroy(cr);
 
 	cairo_surface_destroy(surface);
 	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
+	finishtime(start);
 
+	if(options.print) {
+		NOT_IMPLEMENTED();
+	}
+
+	printf("Done\n");
 	return 0;
 }
