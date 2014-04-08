@@ -1,0 +1,4 @@
+*.o
+bookmaker
+*.pdf
+.DS_Store
