@@ -59,6 +59,8 @@ void write_surface_to_file_showing_crop_box(char* filename, cairo_surface_t *rec
 PopplerDocument* open_document(char* filename);
 
 void add_even_odd_cropboxes(PopplerDocument *document, struct pages_t *pages);
+void add_document_cropboxes(PopplerDocument *document, struct pages_t *pages);
+void add_per_page_cropboxes(PopplerDocument *document, struct pages_t *pages);
 
 void exit_if_cairo_surface_status_not_success(cairo_surface_t* surface, char* file, int line);
 

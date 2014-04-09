@@ -96,9 +96,10 @@ int main(int argc, char** argv) {
 		add_even_odd_cropboxes(popplerDocument, pages);
 		break;
 	case document:
-		NOT_IMPLEMENTED();
+		add_document_cropboxes(popplerDocument, pages);
 		break;
 	case per_page:
+		add_per_page_cropboxes(popplerDocument, pages);
 		break;
 	default:
 		NOT_IMPLEMENTED();

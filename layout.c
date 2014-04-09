@@ -10,6 +10,7 @@ void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, st
 
 	// figure out how many pages to layout
 	int num_pages_to_layout = pages->npages;
+	int num_document_pages = poppler_document_get_n_pages(document);
 	if (num_pages_to_layout%4 != 0) {
 		num_pages_to_layout = pages->npages + (4 - (pages->npages % 4));
 	}
@@ -39,12 +40,17 @@ void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, st
 				NOT_IMPLEMENTED();
 			}
 
-			if (page_num > pages->npages) {
+			if (page_num >= pages->npages) {
 				// blank page, don't try to render it
 				goto FINISH_LAYOUT;
 			}
 
 			struct page_t *page_info = &pages->pages[page_num];
+
+			if (page_info->num >= num_document_pages) {
+				// also a blank page
+				goto FINISH_LAYOUT;
+			}
 
 			// recto pages have odd page numbers
 			// this correctly handles 0 based indexes for 1 based page numbers
