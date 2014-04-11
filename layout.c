@@ -17,7 +17,8 @@ void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, st
 
 		// layout the pages on the paper
 		int show_page = FALSE;
-		for (int page_to_layout = 0; page_to_layout < num_pages_to_layout; page_to_layout++) {
+		int page_to_layout;
+		for (page_to_layout = 0; page_to_layout < num_pages_to_layout; page_to_layout++) {
 			cairo_save(cr);
 
 			// figure out the real page number

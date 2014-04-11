@@ -1,6 +1,8 @@
 #ifndef _ALL_H
 #define _ALL_H
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

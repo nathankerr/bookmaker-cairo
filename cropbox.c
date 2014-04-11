@@ -7,7 +7,8 @@ void evenodd_cropboxes(PopplerDocument *document, cairo_rectangle_t *odd_page_cr
 
 	cairo_surface_t *odd_pages = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
 	cairo_surface_t *even_pages = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
-	for (int page_num = 0; page_num < num_document_pages; page_num++) {
+	int page_num;
+	for (page_num = 0; page_num < num_document_pages; page_num++) {
 		cairo_surface_t *surface = odd_pages;
 		if (page_num % 2 == 1) {
 			surface = even_pages;
@@ -75,7 +76,8 @@ void add_document_cropboxes(PopplerDocument *document, struct pages_t *pages) {
 
 	cairo_surface_t *surface = cairo_recording_surface_create(CAIRO_CONTENT_COLOR_ALPHA, NULL);
 	cairo_t *cr = cairo_create(surface);
-	for (int page_num = 0; page_num < num_document_pages; page_num++) {
+	int page_num;
+	for (page_num = 0; page_num < num_document_pages; page_num++) {
 		PopplerPage *page = poppler_document_get_page(document, page_num);
 		if (page == NULL) {
 			printf("%s:%d: %s\n", __FILE__, __LINE__, error->message);
@@ -101,7 +103,6 @@ void add_document_cropboxes(PopplerDocument *document, struct pages_t *pages) {
 	cairo_surface_destroy(surface);
 	exit_if_cairo_surface_status_not_success(surface, __FILE__, __LINE__);
 
-	int page_num;
 	for (page_num = 0; page_num < pages->npages; page_num++) {
 		struct page_t *page = &pages->pages[page_num];
 		page->crop_box = crop_box;
