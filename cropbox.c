@@ -146,7 +146,7 @@ void add_per_page_cropboxes(PopplerDocument *document, struct pages_t *pages) {
 			&crop_box->height);
 
 		// use to check extent and crop box handling
-		write_surface_to_file_showing_crop_box("per_page.pdf", surface, crop_box);
+		// write_surface_to_file_showing_crop_box("per_page.pdf", surface, crop_box);
 
 		// cleanup surfaces used to get crop boxes
 		cairo_surface_destroy(surface);
