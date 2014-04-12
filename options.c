@@ -78,7 +78,6 @@ struct options_t parse_options(int argc, char** argv) {
 	int opt;
 	while ((opt = getopt_long(argc, argv, optstring, longopts, NULL)) != -1) {
 		switch (opt) {
-		case 'h': // same as default
 		case paper_option:
 			if (strcasecmp(optarg, "a4") == 0) {
 				options.paper = a4;
@@ -123,6 +122,7 @@ struct options_t parse_options(int argc, char** argv) {
 		case version_option:
 			printf("%s\n", VERSION);
 			exit(0);
+		case 'h': // same as default
 		default:
 			usage(options.executable_name);
 		}
