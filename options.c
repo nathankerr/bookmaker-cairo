@@ -30,7 +30,7 @@ char *create_output_filename(char *input_filename) {
 	int n = 2;
 	asprintf(&output_filename, "%s.book.pdf", base);
 	struct stat filestat;
-	while(stat(output_filename, &filestat) == -1 && errno != ENOENT) {
+	while(stat(output_filename, &filestat) != -1 && errno != ENOENT) {
 		free(output_filename);
 		asprintf(&output_filename, "%s.book_%d.pdf", base, n);
 		n++;
