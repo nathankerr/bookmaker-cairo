@@ -20,7 +20,7 @@
 #define VERSION "0.3a"
 
 // toggle to display boxes for debugging
-#define DISPLAY_BOXES
+//#define DISPLAY_BOXES
 
 #define NOT_IMPLEMENTED() printf("NOT_IMPLEMENTED %s:%d\n", __FILE__, __LINE__); exit(1);
 

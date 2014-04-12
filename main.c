@@ -72,10 +72,9 @@ int main(int argc, char** argv) {
 	if (options.print) {
 		// if sending to a printer instead of a file, we can generate ps directly
 		char* lpr_command;
-		asprintf(&lpr_command, "lp %s %s -o sides=two-sided-long-edge -",
+		asprintf(&lpr_command, "lp %s %s -o sides=two-sided-long-edge -o landscape -",
 			options.printer != NULL? "-d": "",
 			options.printer != NULL? options.printer:"");
-		// printf("LPR: %s\n", lpr_command);
 		lpr = popen(lpr_command, "w");
 		// lpr = popen("cat - > book.ps", "w"); // for testing
 		surface = cairo_ps_surface_create_for_stream(write_surface_to_stream, lpr, options.paper_width, options.paper_height);
