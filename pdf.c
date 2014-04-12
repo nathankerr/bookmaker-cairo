@@ -45,8 +45,6 @@ void write_surface_to_file_showing_crop_box(char* filename, cairo_surface_t *rec
 
 // if PopplerDocument* is NULL, return error to user
 PopplerDocument* open_document(char* filename) {
-	GError **error = NULL;
-
 	// resolve path names
 	gchar *absolute;
 	if (g_path_is_absolute(filename)) {
@@ -57,20 +55,19 @@ PopplerDocument* open_document(char* filename) {
 		free(dir);
 	}
 
-	gchar *uri = g_filename_to_uri(absolute, NULL, error);
+	gchar *uri = g_filename_to_uri(absolute, NULL, NULL);
 	free(absolute);
 	if (uri == NULL) {
 		return NULL;
 	}
 
-	PopplerDocument* document = poppler_document_new_from_file(uri, NULL, error);
+	PopplerDocument* document = poppler_document_new_from_file(uri, NULL, NULL);
 	free(uri);
 
 	if (document == NULL) {
-		printf("%s:%d: %s\n", __FILE__, __LINE__, (*error)->message);
+		printf("Could not open document %s\n", filename);
 		exit(1);
 	}
-
 
 	return document;
 }

@@ -142,6 +142,13 @@ struct options_t parse_options(int argc, char** argv) {
 		exit(0);
 	}
 
+	// exit if input file does not exist
+	struct stat filestat;
+	if (stat(options.input_filename, &filestat) == -1 && errno == ENOENT) {
+		printf("%s not found\n", options.input_filename);
+		exit(1);
+	}
+
 	// makeup a suitable output filename if none exists
 	if (options.output_filename == NULL) {
 		options.output_filename = create_output_filename(options.input_filename);

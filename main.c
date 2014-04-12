@@ -2,12 +2,14 @@
 
 double starttime(char* message) {
 	clock_t start = clock();
-	printf("%s", message);
+	printf("%s ", message);
+	fflush(stdout);
 	return start;
 }
 
 void finishtime(clock_t start) {
-	printf(" %fs\n", (double)(clock() - start)/CLOCKS_PER_SEC);
+	printf("%fs\n", (double)(clock() - start)/CLOCKS_PER_SEC);
+	fflush(stdout);
 }
 
 cairo_status_t write_surface_to_stream(void *closure, const unsigned char *data, unsigned int length) {
