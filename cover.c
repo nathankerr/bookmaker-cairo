@@ -179,6 +179,13 @@ void add_cover(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr,
 	cairo_rel_line_to(cr, 0, -10);
 	cairo_stroke(cr);
 
+	// draw spine
+	cairo_move_to(cr, options.paper_width/2.0 - fold_distance, 0);
+	cairo_rel_line_to(cr, 0, options.paper_height);
+	cairo_move_to(cr, options.paper_width/2.0 + fold_distance, 0);
+	cairo_rel_line_to(cr, 0, options.paper_height);
+	cairo_stroke(cr);
+
 	cairo_surface_show_page(surface);
 	cairo_restore(cr);
 }
