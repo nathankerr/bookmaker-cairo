@@ -1,5 +1,5 @@
-CFLAGS=`pkg-config --cflags cairo poppler-glib` -Wall -Werror -g
-LDFLAGS=`pkg-config --libs cairo poppler-glib`
+CFLAGS=`pkg-config --cflags cairo poppler-glib pangocairo` -Wall -Werror -g
+LDFLAGS=`pkg-config --libs cairo poppler-glib pangocairo`
 
 bookmaker: main.o options.o page.o pdf.o cropbox.o layout.o cover.o
 	$(CC) -o $@ $+ $(LDFLAGS)

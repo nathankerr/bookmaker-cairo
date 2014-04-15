@@ -16,6 +16,7 @@
 #include <cairo-pdf.h>
 #include <cairo-ps.h>
 #include <poppler.h>
+#include <pango/pangocairo.h>
 
 #define VERSION "0.3a"
 
@@ -40,6 +41,9 @@ struct options_t {
 	double paper_width;
 	double paper_height;
 	int add_cover;
+	char* title;
+	char* date;
+	char* author;
 };
 
 struct options_t parse_options(int, char**);

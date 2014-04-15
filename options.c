@@ -11,7 +11,10 @@ void usage(char *executable_name) {
 	printf("\t--nopagenumbers\t\tsuppress additional page numbers\n");
 	printf("\t--print\t\t\tsend result to default printer instead of saving to file\n");
 	printf("\t--printer PRINTER\tprint result to specific printer\n\t\t\t\t(implies --print)\n");
-	printf("\t--cover, -c\t\tCreate a cover using the first page of the pdf\n");
+	printf("\t--cover, -c\t\tAdd a cover to the PDF\n\t\t\t\tUses the first page of the PDF if --title is not specified\n");
+	printf("\t--title\t\t\tThe title for the generated cover page (implies --cover)\n");
+	printf("\t--date\t\t\tThe date for the generated cover page\n");
+	printf("\t--author\t\tThe author for the generated cover page\n");
 	printf("\t--version\t\tprints the version string and exits\n");
 	exit(1);
 }
@@ -55,6 +58,9 @@ struct options_t parse_options(int argc, char** argv) {
 	options.print = FALSE;
 	options.printer = NULL;
 	options.add_cover = FALSE;
+	options.title = NULL;
+	options.date = NULL;
+	options.author = NULL;
 
 	enum {
 		paper_option,
@@ -63,7 +69,10 @@ struct options_t parse_options(int argc, char** argv) {
 		no_page_numbers_option,
 		print_option,
 		printer_option,
-		version_option
+		version_option,
+		title_option,
+		date_option,
+		author_option
 	};
 	const char *optstring = "hc";
 	const struct option longopts[] = {
@@ -75,7 +84,10 @@ struct options_t parse_options(int argc, char** argv) {
 		{"print", no_argument, NULL, print_option},
 		{"printer", required_argument, NULL, printer_option},
 		{"version", no_argument, NULL, version_option},
-		{"cover", no_argument, NULL, 'c'}
+		{"cover", no_argument, NULL, 'c'},
+		{"title", required_argument, NULL, title_option},
+		{"date", required_argument, NULL, date_option},
+		{"author", required_argument, NULL, author_option}
 	};
 
 	int opt;
@@ -127,6 +139,16 @@ struct options_t parse_options(int argc, char** argv) {
 			exit(0);
 		case 'c':
 			options.add_cover = TRUE;
+			break;
+		case title_option:
+			options.add_cover = TRUE;
+			options.title = optarg;
+			break;
+		case date_option:
+			options.date = optarg;
+			break;
+		case author_option:
+			options.author = optarg;
 			break;
 		case 'h': // same as default
 		default:
@@ -221,4 +243,7 @@ void print_options(struct options_t options) {
 	} else {
 		printf("no\n");
 	}
+	printf("TITLE: %s\n", options.title);
+	printf("DATE: %s\n", options.date);
+	printf("AUTHOR: %s\n", options.author);
 }
