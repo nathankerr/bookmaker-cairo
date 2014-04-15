@@ -11,6 +11,7 @@ void usage(char *executable_name) {
 	printf("\t--nopagenumbers\t\tsuppress additional page numbers\n");
 	printf("\t--print\t\t\tsend result to default printer instead of saving to file\n");
 	printf("\t--printer PRINTER\tprint result to specific printer\n\t\t\t\t(implies --print)\n");
+	printf("\t--cover, -c\t\tCreate a cover using the first page of the pdf\n");
 	printf("\t--version\t\tprints the version string and exits\n");
 	exit(1);
 }
@@ -53,6 +54,7 @@ struct options_t parse_options(int argc, char** argv) {
 	options.print_page_numbers = TRUE;
 	options.print = FALSE;
 	options.printer = NULL;
+	options.add_cover = FALSE;
 
 	enum {
 		paper_option,
@@ -63,7 +65,7 @@ struct options_t parse_options(int argc, char** argv) {
 		printer_option,
 		version_option
 	};
-	const char *optstring = "h";
+	const char *optstring = "hc";
 	const struct option longopts[] = {
 		{"help", no_argument, NULL, 'h'},
 		{"paper", required_argument, NULL, paper_option},
@@ -72,7 +74,8 @@ struct options_t parse_options(int argc, char** argv) {
 		{"nopagenumbers", no_argument, NULL, no_page_numbers_option},
 		{"print", no_argument, NULL, print_option},
 		{"printer", required_argument, NULL, printer_option},
-		{"version", no_argument, NULL, version_option}
+		{"version", no_argument, NULL, version_option},
+		{"cover", no_argument, NULL, 'c'}
 	};
 
 	int opt;
@@ -122,6 +125,9 @@ struct options_t parse_options(int argc, char** argv) {
 		case version_option:
 			printf("%s\n", VERSION);
 			exit(0);
+		case 'c':
+			options.add_cover = TRUE;
+			break;
 		case 'h': // same as default
 		default:
 			usage(options.executable_name);
@@ -209,4 +215,10 @@ void print_options(struct options_t options) {
 		printf("no\n");
 	}
 	printf("PRINTER: %s\n", options.printer);
+	printf("ADD COVER: ");
+	if (options.add_cover) {
+		printf("yes\n");
+	} else {
+		printf("no\n");
+	}
 }

@@ -1,7 +1,7 @@
 CFLAGS=`pkg-config --cflags cairo poppler-glib` -Wall -Werror -g
 LDFLAGS=`pkg-config --libs cairo poppler-glib`
 
-bookmaker: main.o options.o page.o pdf.o cropbox.o layout.o
+bookmaker: main.o options.o page.o pdf.o cropbox.o layout.o cover.o
 	$(CC) -o $@ $+ $(LDFLAGS)
 
 %.o: %.c all.h

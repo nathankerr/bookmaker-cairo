@@ -39,6 +39,7 @@ struct options_t {
 	char* printer;
 	double paper_width;
 	double paper_height;
+	int add_cover;
 };
 
 struct options_t parse_options(int, char**);
@@ -68,6 +69,8 @@ void exit_if_cairo_surface_status_not_success(cairo_surface_t* surface, char* fi
 
 
 void make_chapbook(char*, char*);
+int get_num_pages_to_layout(int npages);
 void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, struct pages_t *pages, struct options_t options);
+void add_cover(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, struct pages_t *pages, struct options_t options);
 
 #endif /* _ALL_H */

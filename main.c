@@ -108,6 +108,11 @@ int main(int argc, char** argv) {
 	finishtime(start);
 
 	start = starttime("Creating Book");
+
+	if (options.add_cover) {
+		add_cover(popplerDocument, surface, cr, pages, options);
+	}
+
 	// layout the pages
 	layout(popplerDocument, surface, cr, pages, options);
 

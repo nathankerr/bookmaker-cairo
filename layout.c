@@ -1,5 +1,14 @@
 #include "all.h"
 
+// figure out how many pages to layout
+int get_num_pages_to_layout(int npages) {
+	int num_pages_to_layout = npages;
+	if (num_pages_to_layout%4 != 0) {
+		num_pages_to_layout = npages + (4 - (npages % 4));
+	}
+	return num_pages_to_layout;
+}
+
 void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, struct pages_t *pages, struct options_t options) {
 	const double MARGIN = 15; // unprintable margin
 	const double GUTTER = 36; // interior margin
@@ -9,11 +18,12 @@ void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, st
 	const double PAGE_HEIGHT = options.paper_height - MARGIN - MARGIN;
 
 	// figure out how many pages to layout
-	int num_pages_to_layout = pages->npages;
+	int num_pages_to_layout = get_num_pages_to_layout(pages->npages);
+	// int num_pages_to_layout = pages->npages;
 	int num_document_pages = poppler_document_get_n_pages(document);
-	if (num_pages_to_layout%4 != 0) {
-		num_pages_to_layout = pages->npages + (4 - (pages->npages % 4));
-	}
+	// if (num_pages_to_layout%4 != 0) {
+	// 	num_pages_to_layout = pages->npages + (4 - (pages->npages % 4));
+	// }
 
 		// layout the pages on the paper
 		int show_page = FALSE;
