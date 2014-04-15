@@ -131,7 +131,7 @@ void layout(PopplerDocument *document, cairo_surface_t* surface, cairo_t *cr, st
 FINISH_LAYOUT:
 		cairo_restore(cr);
 
-		if (options.print_page_numbers) {
+		if (options.print_page_numbers && page_num < pages->npages) {
 			// add page number
 			char* page_num_text = NULL;
 			asprintf(&page_num_text, "%d", page_num + 1);
